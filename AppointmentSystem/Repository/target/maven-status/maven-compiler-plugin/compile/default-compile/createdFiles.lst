@@ -1,0 +1,11 @@
+com\mycompany\appointmentsystem\repository\TurnoRepository.class
+com\mycompany\appointmentsystem\repository\ClienteRepository.class
+com\mycompany\appointmentsystem\enums\EstadoTurno.class
+com\mycompany\appointmentsystem\Repository.class
+com\mycompany\appointmentsystem\entity\Servicio$ServicioBuilder.class
+com\mycompany\appointmentsystem\repository\ServicioRepository.class
+com\mycompany\appointmentsystem\entity\Cliente$ClienteBuilder.class
+com\mycompany\appointmentsystem\entity\Servicio.class
+com\mycompany\appointmentsystem\entity\Turno$TurnoBuilder.class
+com\mycompany\appointmentsystem\entity\Turno.class
+com\mycompany\appointmentsystem\entity\Cliente.class
