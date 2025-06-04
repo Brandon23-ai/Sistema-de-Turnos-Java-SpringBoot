@@ -1,3 +1,7 @@
+com\mycompany\appointmentsystem\datastructures\pila\TipoAccion.class
+com\mycompany\appointmentsystem\datastructures\pila\Accion.class
 com\mycompany\appointmentsystem\datastructures\ArbolServicios.class
 com\mycompany\appointmentsystem\datastructures\ColaDeTurnos.class
+com\mycompany\appointmentsystem\datastructures\ListaHistorial.class
 com\mycompany\appointmentsystem\DataStructures.class
+com\mycompany\appointmentsystem\datastructures\pila\PilaDeAcciones.class

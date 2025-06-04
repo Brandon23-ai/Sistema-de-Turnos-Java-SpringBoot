@@ -5,16 +5,19 @@
 package com.mycompany.appointmentsystem.service;
 
 import com.mycompany.appointmentsystem.datastructures.ColaDeTurnos;
+import com.mycompany.appointmentsystem.datastructures.ListaHistorial;
+import com.mycompany.appointmentsystem.datastructures.pila.Accion;
+import com.mycompany.appointmentsystem.datastructures.pila.TipoAccion;
 import com.mycompany.appointmentsystem.enums.EstadoTurno;
 import com.mycompany.appointmentsystem.dto.TurnoDTO;
 import com.mycompany.appointmentsystem.entity.Cliente;
 import com.mycompany.appointmentsystem.entity.Servicio;
 import com.mycompany.appointmentsystem.entity.Turno;
 import com.mycompany.appointmentsystem.mapper.TurnoMapper;
+import com.mycompany.appointmentsystem.messaging.producer.TurnoProducer;
 import com.mycompany.appointmentsystem.repository.ClienteRepository;
 import com.mycompany.appointmentsystem.repository.ServicioRepository;
 import com.mycompany.appointmentsystem.repository.TurnoRepository;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,9 @@ public class TurnoService {
     private final ServicioRepository servicioRespository;
     private final ClienteRepository clienteRepository;
     private final ColaDeTurnos colaDeTurnos;
+    private final ListaHistorial listaHistorial;
+    private final AccionService accionService;
+    private final TurnoProducer turnoProducer;
     
     //solicitar un turno
     @Transactional
@@ -41,6 +47,13 @@ public class TurnoService {
         Turno guardado = turnoRepository.save(turno);
         
         colaDeTurnos.agregarTurno(guardado);
+        Accion accion = new Accion(cliente.getId(), TipoAccion.SOLICITAR_TURNO, guardado);
+        accionService.registrarAccion(accion);
+        
+        try {
+            turnoProducer.enviarTurnoCreado(TurnoMapper.toDTO(guardado));
+        } catch (Exception e) {
+        }
 
         return TurnoMapper.toDTO(guardado);
     }
@@ -55,6 +68,7 @@ public class TurnoService {
         
         turno.setEstado(EstadoTurno.ATENDIDO);
         Turno actualizado = turnoRepository.save(turno);
+        listaHistorial.agregarTurno(turno.getCliente().getId(), actualizado);
         
         return TurnoMapper.toDTO(actualizado);
     }

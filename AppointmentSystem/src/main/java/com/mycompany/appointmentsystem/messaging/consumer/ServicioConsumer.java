@@ -10,12 +10,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ServicioConsumer {
-    // realizar alguna acción con el DTO, Ej: inyectar un servicio aquí
-    // private final ServicioService servicioService;
-
-    // public ServicioConsumer(ServicioService servicioService) {
-    //     this.servicioService = servicioService;
-    // }
 
     @RabbitListener(queues = "#{rabbitMQProperties.queue}")
     public void recibirServicio(ServicioDTO servicioDTO) {
@@ -23,9 +17,6 @@ public class ServicioConsumer {
         System.out.println("ID: " + servicioDTO.getId());
         System.out.println("Nombre: " + servicioDTO.getNombre());
         System.out.println("Descripción: " + servicioDTO.getDescripcion());
-
-        // Aquí puedes hacer algo más útil, como guardar en otra tabla, notificar, etc.
-        // servicioService.procesarServicioRecibido(servicioDTO);
     }
     
 }

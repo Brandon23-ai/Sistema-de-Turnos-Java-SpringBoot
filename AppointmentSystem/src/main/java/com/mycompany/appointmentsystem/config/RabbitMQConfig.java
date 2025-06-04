@@ -14,36 +14,27 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
     
-    private final RabbitMQProperties properties;
+    private final RabbitMQProperties props;
 
-    public RabbitMQConfig(RabbitMQProperties properties) {
-        this.properties = properties;
+    public RabbitMQConfig(RabbitMQProperties props) {
+        this.props = props;
     }
     
+    @Bean
+    public TopicExchange exchange() {
+        return new TopicExchange(props.getExchange());
+    }
+
     @Bean
     public Queue queue() {
-        return new Queue(properties.getQueue(), false);
+        return new Queue(props.getQueue());
     }
 
     @Bean
-    public DirectExchange exchange() {
-        return new DirectExchange(properties.getExchange());
+    public Binding binding(Queue queue, TopicExchange exchange) {
+        return BindingBuilder
+            .bind(queue)
+            .to(exchange)
+            .with(props.getRoutingKey()); // ejemplo: turno.*
     }
-
-    @Bean
-    public Binding binding(Queue queue, DirectExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(properties.getRoutingKey());
-    }
-    
-    @Bean
-    public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
-    }
-
-    @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-        RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(jackson2JsonMessageConverter());
-        return template;
-    } 
 }
