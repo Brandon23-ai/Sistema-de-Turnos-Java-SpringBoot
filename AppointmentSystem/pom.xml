@@ -79,6 +79,12 @@
             <scope>test</scope>
         </dependency>
         
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+        
         <!-- Dependencias internas -->
         <dependency>
             <groupId>com.mycompany.appointmentsystem</groupId>

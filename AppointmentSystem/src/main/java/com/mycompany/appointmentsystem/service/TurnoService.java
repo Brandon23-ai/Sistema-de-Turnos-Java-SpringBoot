@@ -19,9 +19,11 @@ import com.mycompany.appointmentsystem.repository.ClienteRepository;
 import com.mycompany.appointmentsystem.repository.ServicioRepository;
 import com.mycompany.appointmentsystem.repository.TurnoRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class TurnoService {
@@ -46,6 +48,8 @@ public class TurnoService {
         Turno turno = TurnoMapper.toEntity(dto, servicio, cliente);
         Turno guardado = turnoRepository.save(turno);
         
+        log.info("Turno solicitado: {} para cliente {}", guardado.getId(), cliente.getNombre());
+        
         colaDeTurnos.agregarTurno(guardado);
         Accion accion = new Accion(cliente.getId(), TipoAccion.SOLICITAR_TURNO, guardado);
         accionService.registrarAccion(accion);
@@ -53,7 +57,7 @@ public class TurnoService {
         try {
             turnoProducer.enviarTurnoCreado(TurnoMapper.toDTO(guardado));
         } catch (Exception e) {
-            System.out.println("Error al enviar a rabbitMQ: "+ e.getMessage());
+            log.error("Error al enviar a rabbitMQ: "+ e);
         }
 
         return TurnoMapper.toDTO(guardado);
@@ -64,19 +68,24 @@ public class TurnoService {
     public TurnoDTO atenderSiguienteTurno() {
         Turno turno = colaDeTurnos.siguienteTurno();
         if (turno == null) {
+            log.warn("Intento de atender turno pero la cola esta vacia");
             throw new RuntimeException("No hay turnos pendientes.");
         }
         
         turno.setEstado(EstadoTurno.ATENDIDO);
         Turno actualizado = turnoRepository.save(turno);
+        
+        log.info("Turno atendido: {}", actualizado.getId());
+        
         listaHistorial.agregarTurno(turno.getCliente().getId(), actualizado);
         Accion accion = new Accion(turno.getCliente().getId(), TipoAccion.ATENDER_TURNO, actualizado);
         accionService.registrarAccion(accion);
         
         try {
             turnoProducer.enviarTurnoAtendido(TurnoMapper.toDTO(actualizado));
+            log.info("Turno atendido enviado a RabbitMQ: {}", actualizado.getId());
         } catch (Exception e) {
-            System.out.println("Error al enviar a RabbitMQ: " + e.getMessage());
+            log.error("Error al enviar atendido: " + e);
         }
         
         return TurnoMapper.toDTO(actualizado);
@@ -89,16 +98,26 @@ public class TurnoService {
                 .orElseThrow(() -> new RuntimeException("Turno no encontrado"));
 
         if (turno.getEstado() != EstadoTurno.PENDIENTE) {
+            log.warn("Intento de cancelar turno que no está pendiente: {}", id);
             throw new RuntimeException("Solo se pueden cancelar turnos pendientes.");
         }
 
         turno.setEstado(EstadoTurno.CANCELADO);
         Turno cancelado = turnoRepository.save(turno);
         
+        log.info("Turno cancelado: {}", cancelado.getId());
+        
         colaDeTurnos.removerTurno(cancelado);
         
         Accion accion = new Accion(turno.getCliente().getId(), TipoAccion.CANCELAR_TURNO, cancelado);
         accionService.registrarAccion(accion);
+        
+        try {
+            turnoProducer.enviarTurnoCancelado(TurnoMapper.toDTO(cancelado));
+            log.info("Turno cancelado enviado a RabbitMQ: {}", cancelado.getId());
+        } catch (Exception e) {
+            log.error("Error al enviar cancealdo: " + e);
+        }
 
         return TurnoMapper.toDTO(cancelado);
     }

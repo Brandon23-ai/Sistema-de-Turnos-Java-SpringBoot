@@ -14,9 +14,11 @@ import com.mycompany.appointmentsystem.repository.ServicioRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class ServicioService {
@@ -29,11 +31,14 @@ public class ServicioService {
         Servicio servicio = ServicioMapper.toEntity(servicioDTO);
         servicio.setPadre(null); // es raíz
         Servicio guardado = servicioRepository.save(servicio);
-
+        
+        log.info("Servicio padre creado con ID: {}", guardado.getId());
+        
         try {
             servicioProducer.enviarServicioCreado(ServicioMapper.toDTO(guardado));
+            log.info("Mensaje de servicio padre enviado a RabbitMQ.");
         } catch (Exception ex) {
-            System.err.println("Error al enviar mensaje RabbitMQ: " + ex.getMessage());
+            log.error("Error al enviar mensaje RabbitMQ: " + ex);
         }
 
         return ServicioMapper.toDTO(guardado);
@@ -42,15 +47,23 @@ public class ServicioService {
     @Transactional
     public ServicioDTO crearServicioHijo(ServicioDTO servicioDTO, Long idPadre) {
         Servicio servicio = ServicioMapper.toEntity(servicioDTO);
+        
         Servicio padre = servicioRepository.findById(idPadre)
-                .orElseThrow(() -> new RuntimeException("Servicio padre no encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("No se encontró servicio padre con ID: {}", idPadre);
+                    return new RuntimeException("Servicio padre no encontrado");
+                });
+        
         servicio.setPadre(padre);
         Servicio guardado = servicioRepository.save(servicio);
+        
+        log.info("Servicio hijo creado con ID: {} bajo el padre ID: {}", guardado.getId(), idPadre);
 
         try {
             servicioProducer.enviarServicioCreado(ServicioMapper.toDTO(guardado));
+            log.info("Mensaje de servicio hijo enviado a RabbitMQ.");
         } catch (Exception ex) {
-            System.err.println("Error al enviar mensaje RabbitMQ: " + ex.getMessage());
+            log.error("Error al enviar mensaje RabbitMQ: " + ex);
         }
 
         return ServicioMapper.toDTO(guardado);
@@ -58,10 +71,18 @@ public class ServicioService {
     
     public List<ServicioRespuestaDTO> listarServiciosEnArbolPlano(Long idPadre) {
         Servicio padre = servicioRepository.findById(idPadre)
-                .orElseThrow(() -> new RuntimeException("Servicio padre no encontrado con ID: " + idPadre));
-
+                .orElseThrow(() -> {
+                    log.warn("No se encontró servicio raíz con ID: {}", idPadre);
+                    return new RuntimeException("Servicio padre no encontrado con ID: " + idPadre);
+                });
+        
+        log.info("Listando servicios en árbol plano desde ID raíz: {}", idPadre);
+        
         List<ServicioRespuestaDTO> resultado = new ArrayList<>();
         recorrerRecursivo(padre, 0, resultado);
+        
+        log.info("Total de servicios en árbol plano: {}", resultado.size());
+        
         return resultado;
     }
     
@@ -83,10 +104,5 @@ public class ServicioService {
             recorrerRecursivo(hijo, nivel + 1, resultado);
         }
     }
-    
-    
-
-    
-    
-    
+  
 }

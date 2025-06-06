@@ -14,20 +14,31 @@ import com.mycompany.appointmentsystem.entity.Turno;
 import com.mycompany.appointmentsystem.mapper.TurnoMapper;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class HistorialService {
-    
+
     private final ListaHistorial listaHistorial;
-    
-    public List<TurnoDTO> obtenerHistorialPorCliente(Long clienteId){
+
+    public List<TurnoDTO> obtenerHistorialPorCliente(Long clienteId) {
+        log.info("Consultando historial de turnos para el cliente con ID: {}", clienteId);
+
         List<Turno> historial = listaHistorial.obtenerHistorial(clienteId);
+
+        if (historial.isEmpty()) {
+            log.warn("No se encontró historial para el cliente con ID: {}", clienteId);
+        } else {
+            log.info("Historial recuperado con {} turnos para el cliente ID: {}", historial.size(), clienteId);
+        }
+
         return historial.stream()
                 .map(TurnoMapper::toDTO)
                 .toList();
     }
-    
+
 }
 
