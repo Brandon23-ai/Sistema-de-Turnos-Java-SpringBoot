@@ -7,8 +7,9 @@ package com.mycompany.appointmentsystem.repository;
 
 import com.mycompany.appointmentsystem.entity.Turno;
 import com.mycompany.appointmentsystem.enums.EstadoTurno;
-import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 
 
 public interface TurnoRepository extends JpaRepository<Turno, Long> {

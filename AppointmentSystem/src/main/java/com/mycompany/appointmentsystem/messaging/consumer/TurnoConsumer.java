@@ -5,6 +5,9 @@
 package com.mycompany.appointmentsystem.messaging.consumer;
 
 import com.mycompany.appointmentsystem.dto.TurnoDTO;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -12,14 +15,32 @@ import org.springframework.stereotype.Component;
 @Component
 public class TurnoConsumer {
     
-    @RabbitListener(queues = "#{rabbitMQProperties.queue}")
-    public void recibirTurno(TurnoDTO dto){
-        System.out.println("Turno recibido desde RabbitMQ: ");
-        System.out.println("ID: " + dto.getId());
-        System.out.println("Nombre Cliente: "+ dto.getNombreCliente());
-        System.out.println("Estado: " + dto.getEstado());
-        System.out.println("ServicioId: " + dto.getServicioId());
-        System.out.println("ClienteId: "+ dto.getClienteId());
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "${rabbitmq.turno.queue}"),
+            exchange = @Exchange(value = "${rabbitmq.turno.exchange}", type = "topic"),
+            key = "${rabbitmq.turno.routing-key}")
+    )
+    public void consumirTurnoCreado(TurnoDTO dto) {
+        System.out.println("Turno creado: " + dto);
     }
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "${rabbitmq.turno.queue}"),
+            exchange = @Exchange(value = "${rabbitmq.turno.exchange}", type = "topic"),
+            key = "turno.atendido")
+    )
+    public void consumirTurnoAtendido(TurnoDTO dto) {
+        System.out.println("Turno atendido: " + dto);
+    }
+    
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "${rabbitmq.turno.queue}"),
+            exchange = @Exchange(value = "${rabbitmq.turno.exchange}", type = "topic"),
+            key = "turno.cancelado")
+    )
+    public void consumirTurnoCancelado(TurnoDTO dto) {
+        System.out.println("Turno cancelado: " + dto);
+    }
+
     
 }

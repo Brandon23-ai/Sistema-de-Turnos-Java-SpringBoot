@@ -21,13 +21,12 @@ public class AccionController {
     private final AccionService accionService;
     
     @PostMapping("/deshacer/cliente/{clienteId}")
-    public ResponseEntity<String> deshacerUltimaAccion(@PathVariable Long clienteId){
-        Accion accion = accionService.desHacerUltimaAccion(clienteId);
-        
-        if (accion != null) {
-            return ResponseEntity.ok("Accion deshecha correctamente.");
-        }else{
-            return ResponseEntity.badRequest().body("No hay acciones para deshacer");
+    public ResponseEntity<String> deshacerUltimaAccion(@PathVariable Long clienteId) {
+        String resultado = accionService.desHacerUltimaAccion(clienteId);
+        if (resultado.startsWith("Se deshizo")) {
+            return ResponseEntity.ok(resultado);
+        } else {
+            return ResponseEntity.badRequest().body(resultado);
         }
     }
     

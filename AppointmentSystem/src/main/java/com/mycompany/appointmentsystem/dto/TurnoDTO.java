@@ -4,6 +4,7 @@
  */
 package com.mycompany.appointmentsystem.dto;
 
+import com.mycompany.appointmentsystem.enums.EstadoTurno;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

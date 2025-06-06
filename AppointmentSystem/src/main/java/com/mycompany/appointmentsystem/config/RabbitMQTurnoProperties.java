@@ -8,9 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
-@Component
-@ConfigurationProperties(prefix = "rabbitmq")
-public class RabbitMQProperties {
+@ConfigurationProperties(prefix = "rabbitmq.turno")
+public class RabbitMQTurnoProperties {
     private String queue;
     private String exchange;
     private String routingKey;  

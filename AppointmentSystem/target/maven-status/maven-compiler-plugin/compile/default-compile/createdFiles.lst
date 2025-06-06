@@ -1,5 +1,6 @@
 com\mycompany\appointmentsystem\messaging\producer\ServicioProducer.class
 com\mycompany\appointmentsystem\controller\TurnoController.class
+com\mycompany\appointmentsystem\service\AccionService$1.class
 com\mycompany\appointmentsystem\AppointmentSystem.class
 com\mycompany\appointmentsystem\mapper\ServicioMapper.class
 com\mycompany\appointmentsystem\controller\ClienteController.class
@@ -14,14 +15,15 @@ com\mycompany\appointmentsystem\dto\TurnoDTO.class
 com\mycompany\appointmentsystem\dto\ServicioRespuestaDTO$ServicioRespuestaDTOBuilder.class
 com\mycompany\appointmentsystem\mapper\ClienteMapper.class
 com\mycompany\appointmentsystem\dto\TurnoDTO$TurnoDTOBuilder.class
+com\mycompany\appointmentsystem\config\RabbitMQTurnoProperties.class
 com\mycompany\appointmentsystem\messaging\consumer\ServicioConsumer.class
 com\mycompany\appointmentsystem\messaging\consumer\TurnoConsumer.class
 com\mycompany\appointmentsystem\service\ServicioService.class
 com\mycompany\appointmentsystem\dto\ServicioDTO$ServicioDTOBuilder.class
+com\mycompany\appointmentsystem\config\RabbitMQServicioProperties.class
 com\mycompany\appointmentsystem\mapper\TurnoMapper.class
 com\mycompany\appointmentsystem\service\TurnoService.class
 com\mycompany\appointmentsystem\controller\ServicioController.class
 com\mycompany\appointmentsystem\controller\HistorialController.class
-com\mycompany\appointmentsystem\config\RabbitMQProperties.class
 com\mycompany\appointmentsystem\dto\ClienteDTO.class
 com\mycompany\appointmentsystem\dto\ServicioDTO.class

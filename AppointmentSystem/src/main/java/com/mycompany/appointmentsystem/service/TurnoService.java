@@ -53,6 +53,7 @@ public class TurnoService {
         try {
             turnoProducer.enviarTurnoCreado(TurnoMapper.toDTO(guardado));
         } catch (Exception e) {
+            System.out.println("Error al enviar a rabbitMQ: "+ e.getMessage());
         }
 
         return TurnoMapper.toDTO(guardado);
@@ -69,6 +70,14 @@ public class TurnoService {
         turno.setEstado(EstadoTurno.ATENDIDO);
         Turno actualizado = turnoRepository.save(turno);
         listaHistorial.agregarTurno(turno.getCliente().getId(), actualizado);
+        Accion accion = new Accion(turno.getCliente().getId(), TipoAccion.ATENDER_TURNO, actualizado);
+        accionService.registrarAccion(accion);
+        
+        try {
+            turnoProducer.enviarTurnoAtendido(TurnoMapper.toDTO(actualizado));
+        } catch (Exception e) {
+            System.out.println("Error al enviar a RabbitMQ: " + e.getMessage());
+        }
         
         return TurnoMapper.toDTO(actualizado);
     }
@@ -87,6 +96,9 @@ public class TurnoService {
         Turno cancelado = turnoRepository.save(turno);
         
         colaDeTurnos.removerTurno(cancelado);
+        
+        Accion accion = new Accion(turno.getCliente().getId(), TipoAccion.CANCELAR_TURNO, cancelado);
+        accionService.registrarAccion(accion);
 
         return TurnoMapper.toDTO(cancelado);
     }

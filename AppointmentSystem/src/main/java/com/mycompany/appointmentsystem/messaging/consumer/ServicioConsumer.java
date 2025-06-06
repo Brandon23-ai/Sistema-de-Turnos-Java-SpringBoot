@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServicioConsumer {
 
-    @RabbitListener(queues = "#{rabbitMQProperties.queue}")
+    @RabbitListener(queues = "${rabbitmq.servicio.queue}")
     public void recibirServicio(ServicioDTO servicioDTO) {
         System.out.println("Servicio recibido desde RabbitMQ:");
         System.out.println("ID: " + servicioDTO.getId());
