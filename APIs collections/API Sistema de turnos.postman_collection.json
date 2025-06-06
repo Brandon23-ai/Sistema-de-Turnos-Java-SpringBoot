@@ -1,0 +1,339 @@
+{
+	"info": {
+		"_postman_id": "8920e042-f151-4a64-a0bf-17d2a53b9ddf",
+		"name": "API Sistema de turnos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45675324"
+	},
+	"item": [
+		{
+			"name": "POST",
+			"item": [
+				{
+					"name": "(POST) crear cliente",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"Jessenia Escobar\",\r\n  \"dpi\": \"9834277654361010\",\r\n  \"email\": \"jess6@example.com\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/clientes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes"
+							]
+						},
+						"description": "- Crea un nuevo cliente en la base de datos.\r\n- Usar este endpoint antes de crear turnos.\r\n- Body requerido: nombre, dpi, email."
+					},
+					"response": []
+				},
+				{
+					"name": "(POST) crear servicio padre ",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"salud\",\r\n  \"descripcion\": \"servicios de salud social\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/servicios/padre",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"servicios",
+								"padre"
+							]
+						},
+						"description": "- Crea un servicio raíz sin padre asignado.\r\n- Requiere nombre y descripción en el cuerpo (JSON).\r\n- Devuelve el servicio creado con su ID."
+					},
+					"response": []
+				},
+				{
+					"name": "(POST) Crear servicio hijo",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"Emergencia\",\r\n  \"descripcion\": \"Emergencia para adultos\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/servicios/hijo/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"servicios",
+								"hijo",
+								"1"
+							]
+						},
+						"description": "- Crea un nuevo servicio como hijo de otro existente.\r\n- Requiere nombre, descripción en el cuerpo (JSON) y idPadre como parámetro en la URL.\r\n- Devuelve el servicio creado con su ID y referencia al padre.\r\n- Lanza error si el ID del servicio padre no existe."
+					},
+					"response": []
+				},
+				{
+					"name": "(POST) Crear un turno",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"clienteId\": 1,\r\n  \"nombreCliente\": \"Brandon Morales\",\r\n  \"servicioId\": 1\r\n  \r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/turno",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"turno"
+							]
+						},
+						"description": "- Registra un nuevo turno para un cliente en un servicio específico.\r\n- Requiere un JSON con clienteId, servicioId y nombreCliente.\r\n- Devuelve los datos del turno creado (incluye id, estado, fechaCreacion, etc.).\r\n- Lanza error si el cliente o servicio no existen."
+					},
+					"response": []
+				},
+				{
+					"name": "(POST) Deshacer acciones en orden de pila",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/acciones/deshacer/cliente/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"acciones",
+								"deshacer",
+								"cliente",
+								"1"
+							]
+						},
+						"description": "-  Revierte la última acción realizada por el cliente (crear, cancelar o atender turno).\r\n- Requiere el clienteId como parámetro en la URL.\r\n- Aplica una lógica tipo pila (LIFO).\r\n- Lanza mensaje si no hay acciones para deshacer."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GET",
+			"item": [
+				{
+					"name": "(GET) Mostrar niveles de ArbolServicios",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/servicios/arbol/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"servicios",
+								"arbol",
+								"1"
+							]
+						},
+						"description": "- Devuelve todos los servicios hijos en formato de lista jerárquica (plano con niveles).\r\n- Requiere el idPadre como parámetro en la URL.\r\n- Responde con una lista de objetos que incluyen id, nombre, descripción y nivel.\r\n- Lanza error si el ID del servicio padre no existe."
+					},
+					"response": []
+				},
+				{
+					"name": "(GET) Atender turno en orden FIFO",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/turno/atender",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"turno",
+								"atender"
+							]
+						},
+						"description": "- Atiende el siguiente turno pendiente en orden FIFO.\r\n- Devuelve el turno atendido con estado actualizado.\r\n- Lanza error si no hay turnos pendientes para atender."
+					},
+					"response": []
+				},
+				{
+					"name": "(GET) Mostrar historial de turnos atendidos por cliente",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/historial/cliente/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"historial",
+								"cliente",
+								"1"
+							]
+						},
+						"description": "- Obtiene la lista completa de turnos que han sido atendidos por un cliente específico.\r\n- Requiere el clienteId como parámetro en la URL.\r\n- Lanza una excepcion si el id no existe."
+					},
+					"response": []
+				},
+				{
+					"name": "(GET) Obtiene cliente por ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/clientes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes",
+								"1"
+							]
+						},
+						"description": "- Requiere el parámetro id en la URL.\r\n- Devuelve los detalles del cliente si existe en la base de datos.\r\n- Retorna excepcion si no se encuentra el cliente con el ID proporcionado."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DELETE",
+			"item": [
+				{
+					"name": "(DELETE) Eliminar turno por ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/turno/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"turno",
+								"3"
+							]
+						},
+						"description": "- Elimina un turno si existe en la base de datos.\r\n- Requiere el id del turno como parámetro en la URL.\r\n- Lanza error si el turno no existe."
+					},
+					"response": []
+				},
+				{
+					"name": "(DELETE) Elimina cliente por ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/clientes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes",
+								"1"
+							]
+						},
+						"description": "- Elimina un cliente específico identificado por su ID.\r\n- Requiere el parámetro id en la URL.\r\n- Retorna estado 204 (No Content) si la eliminación fue exitosa.\r\n- Retorna error 404 si no se encuentra el cliente con el ID proporcionado."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
