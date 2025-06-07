@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Servicio de RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # Puerto AMQP
+      - "15672:15672"  # Interfaz web de gestión
+    environment:
+      RABBITMQ_DEFAULT_USER: guest  
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+  # Servicio de MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin  # Coincide con tu properties
+      MYSQL_DATABASE: turnosdb
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql-init:/docker-entrypoint-initdb.d  # Carpeta para scripts SQL iniciales
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+volumes:
+  rabbitmq_data:
+  mysql_data:
+
+networks:
+  backend-network:
+    driver: bridge
